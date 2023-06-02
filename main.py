@@ -89,10 +89,7 @@ async def on_ready():
 
 async def notify_discord(stream):
   tz_LA = pytz.timezone('America/Los_Angeles')
-  threshold = (datetime.now() - timedelta(seconds=300)).astimezone(tz_LA)
   timestamp = stream.started_at.astimezone(tz_LA)
-  if (timestamp < threshold):
-    return
   game = await(first(twitch.get_games(game_ids=[stream.game_id])))
   user = await(first(twitch.get_users(logins=[stream.user_name])))
 
