@@ -1,16 +1,16 @@
 # For debugging
 # from pprint import pprint
-
-import settings
 import asyncio
 import os
 import pytz
 from datetime import datetime, timedelta
 from threading import Thread
+from dotenv.main import load_dotenv
 
 import discord
 from flask import Flask
 from twitchAPI.twitch import Twitch
+from twitchAPI.helper import first
 
 # Comma separated list of Twitch usernames for which to retrieve stream information
 user_logins = [
@@ -22,13 +22,13 @@ user_logins = [
   'IkkeZen', 'Zeroni_vt', 'Venenofgc', 'DocDresden', 'RyujinHayato'
 ]
 
-DISCORD_BOT_SECRET = settings.DISCORD_BOT_SECRET
-TWITCH_BOT_APP_ID = settings.TWITCH_BOT_APP_ID
-TWITCH_BOT_SECRET = settings.TWITCH_BOT_SECRET
+load_dotenv()
+DISCORD_BOT_SECRET = os.environ['DISCORD_BOT_SECRET']
+TWITCH_BOT_APP_ID = os.environ['TWITCH_BOT_APP_ID']
+TWITCH_BOT_SECRET = os.environ['TWITCH_BOT_SECRET']
 
 
 known_streams = {login: None for login in user_logins}
-print(known_streams)
 app = Flask('')
 
 intents = discord.Intents.default()
@@ -93,12 +93,13 @@ async def notify_discord(stream):
   timestamp = stream.started_at.astimezone(tz_LA)
   if (timestamp < threshold):
     return
-  game = twitch.get_games(game_ids=[stream.game_id])['data'][0]
-  user = twitch.get_users(logins=[stream.user_name])['data'][0]
+  game = await(first(twitch.get_games(game_ids=[stream.game_id])))
+  user = await(first(twitch.get_users(logins=[stream.user_name])))
 
   if stream.user_name == "ZenNoKiseki":
     channel = client.get_channel(877043070749802516)
     message = "Hey, <@&877620295882661918>! Welcome to Abend Time. I'm your host, Misty, here to let you know that the Kiseki Cafe is open for business today! Come on in and relax for a while with a nice cup of coffee and a meal to unwind after a long day!"
+    print(message)
     embed = discord.Embed(
       title=f"https://www.twitch.tv/{stream.user_name}",
       colour=discord.Colour(0x9146FF),
@@ -108,6 +109,7 @@ async def notify_discord(stream):
   else:
     channel = client.get_channel(877078280820375582)
     message = "Hey, <@&877620295882661918>! Welcome to Abend Time. I'm your host, Misty, here to let you know that " + stream.user_name + " is streaming right now! Come check them out!"
+    print(message)
     embed = discord.Embed(
       title=f"https://www.twitch.tv/{stream.user_name}",
       colour=discord.Colour(0x9146FF),
@@ -117,8 +119,8 @@ async def notify_discord(stream):
   # embed.set_image(
   #  url=stream["thumbnail_url"].replace("{width}", "640").replace("{height}", "360")
   # )
-  embed.set_thumbnail(url=user["profile_image_url"])
-  embed.add_field(name="Now Playing", value=game["name"], inline=False)
+  embed.set_thumbnail(url=user.profile_image_url)
+  embed.add_field(name="Now Playing", value=game.name, inline=False)
 
   embed.set_footer(text=timestamp.strftime("%B %d, %Y at %-I:%M%p"))
   await channel.send(message, embed=embed)
