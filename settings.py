@@ -1,0 +1,3 @@
+DISCORD_BOT_SECRET="ODA1MTg1MTI4OTE3MjM3NzYw.GRP7DH.KA8981Cs6-mfF4oWuxMsv_XVmkBvTiZehaxwd8"
+TWITCH_BOT_APP_ID="uyg9mlngvbkluwfko59ge670bj333n"
+TWITCH_BOT_SECRET="tzjvptz4k8xeiufp0rwhenezyqhq5d"
