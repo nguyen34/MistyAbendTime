@@ -65,6 +65,8 @@ async def refresh_notification():
     while True:
         streams = twitch.get_streams(user_login=user_logins)
         stream_map = {stream.user_name: stream async for stream in streams}
+        stream_list = list(stream_map.keys())
+        print(f'Active Streamers: {stream_list}')
         for key in stream_map:
             if key not in known_streams or known_streams[key] is None:
                 known_streams[key] = stream_map[key]
