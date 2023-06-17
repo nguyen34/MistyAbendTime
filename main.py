@@ -30,6 +30,11 @@ DISCORD_BOT_SECRET = os.environ['DISCORD_BOT_SECRET']
 TWITCH_BOT_APP_ID = os.environ['TWITCH_BOT_APP_ID']
 TWITCH_BOT_SECRET = os.environ['TWITCH_BOT_SECRET']
 
+DISCORD_ID = 814658322236964904
+DISCORD_CHANNEL_ID_FRIENDS = 877078280820375582
+DISCORD_CHANNEL_ID_MAIN = 877043070749802516
+STREAM_PING_ROLE_ID = 877620295882661918
+
 known_streams = {login: None for login in user_logins}
 app = Flask('')
 
@@ -85,7 +90,7 @@ async def on_ready():
     print("I'm in")
     print(client.user)
 
-    guild = client.get_guild(814658322236964904)
+    guild = client.get_guild(DISCORD_ID)
     # For initialization
     #await edit_message()
     # await add_reactions()
@@ -105,8 +110,8 @@ async def notify_discord(stream):
     user = await (first(twitch.get_users(logins=[stream.user_name])))
 
     if stream.user_name == "ZenNoKiseki":
-        channel = client.get_channel(877043070749802516)
-        message = "Hey, <@&877620295882661918>! Welcome to Abend Time. I'm your host, Misty, here to let you know that the Kiseki Cafe is open for business today! Come on in and relax for a while with a nice cup of coffee and a meal to unwind after a long day!"
+        channel = client.get_channel(DISCORD_CHANNEL_ID_MAIN)
+        message = f"Hey, <@&{STREAM_PING_ROLE_ID}>! Welcome to Abend Time. I'm your host, Misty, here to let you know that the Kiseki Cafe is open for business today! Come on in and relax for a while with a nice cup of coffee and a meal to unwind after a long day!"
         embed = discord.Embed(
             title=f"https://www.twitch.tv/{stream.user_name}",
             colour=discord.Colour(0x9146FF),
@@ -114,8 +119,8 @@ async def notify_discord(stream):
             description=stream.title,
         )
     else:
-        channel = client.get_channel(877078280820375582)
-        message = "Hey, <@&877620295882661918>! Welcome to Abend Time. I'm your host, Misty, here to let you know that " + stream.user_name + " is streaming right now! Come check them out!"
+        channel = client.get_channel(DISCORD_CHANNEL_ID_FRIENDS)
+        message = "Hey, <@&{STREAM_PING_ROLE_ID}>! Welcome to Abend Time. I'm your host, Misty, here to let you know that " + stream.user_name + " is streaming right now! Come check them out!"
         embed = discord.Embed(
             title=f"https://www.twitch.tv/{stream.user_name}",
             colour=discord.Colour(0x9146FF),
